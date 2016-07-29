@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class GithubAPIClient {
     
@@ -27,93 +28,144 @@ class GithubAPIClient {
             }
         }
         task.resume()
+        
     }
+
     
     class func checkIfRepositoryIsStarred(fullName: String, completion: (Bool) -> ()) {
         let secret = Secrets()
-        let urlString = "https://api.github.com/user/starred/\(fullName)"
-        let url = NSURL(string: urlString)
-        let session = NSURLSession.sharedSession()
-        guard let unwrappedURL = url else { fatalError("Invalid URL") }
+//        let urlString = "https://api.github.com/user/starred/\(fullName)"
+//        let url = NSURL(string: urlString)
+//        let session = NSURLSession.sharedSession()
+//        guard let unwrappedURL = url else { fatalError("Invalid URL") }
+//        
+//        let request = NSMutableURLRequest(URL: unwrappedURL)
+//        request.HTTPMethod = "GET"
+//        request.addValue(secret.token, forHTTPHeaderField: "Authorization")
+//        
+//        let task = session.dataTaskWithRequest(request){data, response, error in
+//            guard let responseValue = response as? NSHTTPURLResponse else {
+//                assertionFailure("Assignment failed")
+//                return
+//            }
+//            
+//            if responseValue.statusCode == 204 {
+//                completion(true)
+//                print ("Repo is valid")
+//            } else if responseValue.statusCode == 404 {
+//                completion(false)
+//                print ("404 ERROR")
+//            } else {
+//                print ("Other status code \(responseValue.statusCode)")
+//            }
+//        }
+//        
+//        task.resume()
         
-        let request = NSMutableURLRequest(URL: unwrappedURL)
-        request.HTTPMethod = "GET"
-        request.addValue(secret.token, forHTTPHeaderField: "Authorization")
-        
-        let task = session.dataTaskWithRequest(request){data, response, error in
-            guard let responseValue = response as? NSHTTPURLResponse else {
-                assertionFailure("Assignment failed")
-                return
-            }
-            
-            if responseValue.statusCode == 204 {
-                completion(true)
-                print ("Repo is valid")
-            } else if responseValue.statusCode == 404 {
-                completion(false)
-                print ("404 ERROR")
-            } else {
-                print ("Other status code \(responseValue.statusCode)")
-            }
+        Alamofire.request(.GET, "https://api.github.com/user/starred/\(fullName)", parameters: nil ,encoding: ParameterEncoding.JSON,
+                          headers: ["Authorization":secret.token])
+            .validate()
+            .responseJSON { response in
+                if let responseValue = response.response {
+                    switch responseValue.statusCode {
+                    case 204:
+                        completion(true)
+                        print ("Repo is unstarred, now starring")
+                    case 404:
+                        completion(false)
+                        print ("Repo is starred, now unstarring")
+                    default :
+                        print ("Other status code \(responseValue.statusCode)")
+                    }
+                }
         }
-        
-        task.resume()
     }
     
     class func starRepository(fullName: String, completion:() -> ()) {
         let secret = Secrets()
-        let urlString = "https://api.github.com/user/starred/\(fullName)"
-        let url = NSURL(string: urlString)
-        let session = NSURLSession.sharedSession()
-        guard let unwrappedURL = url else { fatalError("Invalid URL") }
+//        let urlString = "https://api.github.com/user/starred/\(fullName)"
+//        let url = NSURL(string: urlString)
+//        let session = NSURLSession.sharedSession()
+//        guard let unwrappedURL = url else { fatalError("Invalid URL") }
+//        
+//        let request = NSMutableURLRequest(URL: unwrappedURL)
+//        request.HTTPMethod = "PUT"
+//        request.addValue(secret.token, forHTTPHeaderField: "Authorization")
+//        
+//        let task = session.dataTaskWithRequest(request){data, response, error in
+//            guard let responseValue = response as? NSHTTPURLResponse else {
+//                assertionFailure("Assignment failed")
+//                return
+//            }
+//            
+//            if responseValue.statusCode == 204 {
+//                completion()
+//                print("STARRED")
+//            } else {
+//                print ("Other status code \(responseValue.statusCode)")
+//            }
+//        }
+//        
+//        task.resume()
         
-        let request = NSMutableURLRequest(URL: unwrappedURL)
-        request.HTTPMethod = "PUT"
-        request.addValue(secret.token, forHTTPHeaderField: "Authorization")
-        
-        let task = session.dataTaskWithRequest(request){data, response, error in
-            guard let responseValue = response as? NSHTTPURLResponse else {
-                assertionFailure("Assignment failed")
-                return
-            }
-            
-            if responseValue.statusCode == 204 {
-                completion()
-                print("STARRED")
-            } else {
-                print ("Other status code \(responseValue.statusCode)")
-            }
+        Alamofire.request(.PUT, "https://api.github.com/user/starred/\(fullName)", parameters: nil ,encoding: ParameterEncoding.JSON,
+            headers: ["Authorization":secret.token])
+            .validate()
+            .responseJSON { response in
+                if let responseValue = response.response {
+                    switch responseValue.statusCode {
+                    case 204:
+                        completion()
+                        print ("STARRED")
+                    default :
+                        print ("Other status code \(responseValue.statusCode)")
+                    }
+                }
         }
-        
-        task.resume()
     }
     
     class func unStarRepository(fullName: String, completion:() -> ()) {
         let secret = Secrets()
-        let urlString = "https://api.github.com/user/starred/\(fullName)"
-        let url = NSURL(string: urlString)
-        let session = NSURLSession.sharedSession()
-        guard let unwrappedURL = url else { fatalError("Invalid URL") }
+//        let urlString = "https://api.github.com/user/starred/\(fullName)"
+//        let url = NSURL(string: urlString)
+//        let session = NSURLSession.sharedSession()
+//        guard let unwrappedURL = url else { fatalError("Invalid URL") }
+//        
+//        let request = NSMutableURLRequest(URL: unwrappedURL)
+//        request.HTTPMethod = "DELETE"
+//        request.addValue(secret.token, forHTTPHeaderField: "Authorization")
+//        
+//        let task = session.dataTaskWithRequest(request){data, response, error in
+//            guard let responseValue = response as? NSHTTPURLResponse else {
+//                assertionFailure("Assignment failed")
+//                return
+//            }
+//            
+//            if responseValue.statusCode == 204 {
+//                completion()
+//                print("UnSTARRED")
+//            } else {
+//                print ("Other status code \(responseValue.statusCode)")
+//            }
+//        }
+//        
+//        task.resume()
         
-        let request = NSMutableURLRequest(URL: unwrappedURL)
-        request.HTTPMethod = "DELETE"
-        request.addValue(secret.token, forHTTPHeaderField: "Authorization")
-        
-        let task = session.dataTaskWithRequest(request){data, response, error in
-            guard let responseValue = response as? NSHTTPURLResponse else {
-                assertionFailure("Assignment failed")
-                return
-            }
-            
-            if responseValue.statusCode == 204 {
-                completion()
-                print("UnSTARRED")
-            } else {
-                print ("Other status code \(responseValue.statusCode)")
-            }
+        Alamofire.request(.DELETE, "https://api.github.com/user/starred/\(fullName)", parameters: nil ,encoding: ParameterEncoding.JSON,
+            headers: ["Authorization":secret.token])
+            .validate()
+            .responseJSON { response in
+                if let responseValue = response.response {
+                    switch responseValue.statusCode {
+                    case 204:
+                        completion()
+                        print ("UNSTARRED")
+                    default :
+                        print ("Other status code \(responseValue.statusCode)")
+                    }
+                }
         }
-        
-        task.resume()
     }
+
 }
 
